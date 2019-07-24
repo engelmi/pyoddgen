@@ -1,4 +1,4 @@
-from pyoddgen.datastructures.serializable import Serializable
+from pyoddgen.serializable import Serializable
 
 
 class GeneratedDataRecord(Serializable):
