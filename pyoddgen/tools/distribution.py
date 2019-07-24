@@ -4,30 +4,49 @@ from enum import Enum
 
 class Distribution(object):
 
+    class Method(Enum):
+        NONE = 0
+        UNIFORM = 1
+        EXPONENTIAL = 2
+        NORMAL = 3
+
     def __init__(self, distribution_method):
-        if not isinstance(distribution_method, DistributionMethod):
-            raise Exception("Method of distribution must be of type '" + str(DistributionMethod) + "'!")
+        if not isinstance(distribution_method, Distribution.Method):
+            raise Exception("Method of distribution must be of type '" + str(Distribution.Method) + "'!")
         self.distribution_method = distribution_method
-        self.distribution_func = distribution_method.value[1]
         self.state = random.getstate()
 
     def next(self):
         r = None
-        if self.distribution_func is not None:
+        func = self.get_distribution_func()
+        if func is not None:
             saved_state = random.getstate()
             random.setstate(self.state)
-            r = self.distribution_func()
+            r = func()
+            self.state = random.getstate()
             random.setstate(saved_state)
         return r
 
     def next_batch(self, batch_sizes):
         r = None
-        if self.distribution_method is not None:
+        func = self.get_distribution_func()
+        if func is not None:
             saved_state = random.getstate()
             random.setstate(self.state)
-            r = Distribution.generate_batch(batch_sizes, self.distribution_method)
+            r = Distribution.generate_batch(batch_sizes, func)
+            self.state = random.getstate()
             random.setstate(saved_state)
         return r
+
+    def get_distribution_func(self):
+        if self.distribution_method == Distribution.Method.NONE:
+            return None
+        if self.distribution_method == Distribution.Method.UNIFORM:
+            return Distribution.next_uniform
+        if self.distribution_method == Distribution.Method.NORMAL:
+            return Distribution.next_normal
+        if self.distribution_method == Distribution.Method.EXPONENTIAL:
+            return Distribution.next_exp
 
     @classmethod
     def next_uniform(cls, _min=0.0, _max=1.0, calc_distance=False):
@@ -49,16 +68,15 @@ class Distribution(object):
         return random.normalvariate(_mu, _n_sigma)
 
     @classmethod
-    def generate_batch(cls, batch_sizes, distribution_method, calc_distance=False):
+    def generate_batch(cls, batch_sizes, distribution_func, calc_distance=False):
         if not isinstance(batch_sizes, list):
             raise Exception("Batch description must be in the form of '[<num_1>,<num_2>,...,<num_n>]'!")
-        if not isinstance(distribution_method, DistributionMethod):
-            raise Exception("Method of distribution must be of type '" + str(DistributionMethod) + "'!")
-        distribution = distribution_method.value[1]
+        if not callable(distribution_func):
+            raise Exception("Method of distribution must be callable!")
         random_batch = [[] for _ in range(len(batch_sizes))]
         for i in range(len(batch_sizes)):
             for j in range(batch_sizes[i]):
-                random_batch[i].append(distribution(calc_distance=calc_distance))
+                random_batch[i].append(distribution_func(calc_distance=calc_distance))
         return random_batch
 
     @classmethod
@@ -74,18 +92,3 @@ class Distribution(object):
         return sorted_entries
     DISTANCE_METRIC_MAX = max
     DISTANCE_METRIC_MIN = min
-
-
-class DistributionMethod(Enum):
-    NONE = (0, None)
-    UNIFORM = (1, Distribution.next_uniform)
-    EXPONENTIAL = (2, Distribution.next_exp)
-    NORMAL = (3, Distribution.next_normal)
-
-
-if __name__ == "__main__":
-    d = Distribution(DistributionMethod.NORMAL)
-    batch = d.next_batch([10, 5, 3, 111])
-    print(batch)
-    sorted_batch = Distribution.sort_batch_by_distance(batch, Distribution.DISTANCE_METRIC_MIN)
-    print(sorted_batch)
