@@ -24,8 +24,8 @@ class ObjectDetectionDataRecord(GeneratedDataRecord):
         """
         if not Image.isImageType(pil_image):
             raise Exception("Image must be of type '" + str(Image) + "'! Got '" + str(type(pil_image)) + "' instead. ")
-        if not (len(self.xmins) == len(self.xmaxs) == len(self.ymins) == len(self.ymaxs) == len(self.classes_text) == len(self.classes)):
-            raise Exception("Error creating tf record: Length of xmin, xmax, ymin, ymax, classes_text, classes must match!")
+        if not (len(xmins) == len(xmaxs) == len(ymins) == len(ymaxs) == len(classes_text) == len(classes)):
+            raise Exception("Length of xmin, xmax, ymin, ymax, classes_text and classes must match!")
         # convert pil image to bytes
         self.pil_image_encoded = pil_to_byte(pil_image)
         self.pil_image_width, self.pil_image_height = pil_image.size
