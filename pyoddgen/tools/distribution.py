@@ -16,24 +16,24 @@ class Distribution(object):
         self.distribution_method = distribution_method
         self.state = random.getstate()
 
-    def next(self):
+    def next(self, calc_distance=False):
         r = None
         func = self.get_distribution_func()
         if func is not None:
             saved_state = random.getstate()
             random.setstate(self.state)
-            r = func()
+            r = func(calc_distance=calc_distance)
             self.state = random.getstate()
             random.setstate(saved_state)
         return r
 
-    def next_batch(self, batch_sizes):
+    def next_batch(self, batch_sizes, calc_distance=False):
         r = None
         func = self.get_distribution_func()
         if func is not None:
             saved_state = random.getstate()
             random.setstate(self.state)
-            r = Distribution.generate_batch(batch_sizes, func)
+            r = Distribution.generate_batch(batch_sizes, func, calc_distance)
             self.state = random.getstate()
             random.setstate(saved_state)
         return r
