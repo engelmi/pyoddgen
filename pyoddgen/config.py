@@ -1,6 +1,7 @@
 from os import getcwd
 from os.path import join
 
+from pyoddgen.tools.directory import create_directory, create_directories, delete_directory
 from pyoddgen.generators.basegen import BaseGenerator
 from pyoddgen.generators.objdetgen import ObjectDetectionGenerator
 from pyoddgen.datastructures.gendataobjdet import ObjectDetectionDataRecord
@@ -15,6 +16,15 @@ class ProjectConfiguration(Serializable):
         self.base_dir = getcwd()
         self.project_dir = join(self.base_dir, "project-1")
         self.generator_config_list = []
+
+    def setup_project_directory_structure(self):
+        # clean up existing project and re-create it
+        delete_directory(self.project_dir)
+        create_directory(self.project_dir)
+
+    def setup_generator_directory_structures(self):
+        for generator in self.generator_config_list:
+            generator.setup_generator_directory(self.project_dir)
 
     # todo: implement
     def is_valid(self):
@@ -46,6 +56,18 @@ class GeneratorConfiguration(Serializable):
         # log
         self.generated_data_log_enabled = True
 
+    def setup_generator_directory(self, project_dir):
+        generator_dir = join(project_dir, self.generator_dir)
+        _, ex = delete_directory(generator_dir)
+        if ex is not None:
+            raise Exception("Error on deleting directory '" + generator_dir + "'!", ex)
+
+        resource_dir = join(project_dir, self.config.resource_dir)
+        output_dir = join(project_dir, self.config.output_dir)
+        _, ex = create_directories([resource_dir, output_dir])
+        if ex is not None:
+            raise Exception(ex)
+
     # todo: implement
     def is_valid(self):
         return True
@@ -74,7 +96,17 @@ class ObjectDetectionConfiguration(GeneratorConfiguration):
         self.position_distribution_method = Distribution.Method.UNIFORM
         self.number_of_pastes_per_background_min = 0
         self.number_of_pastes_per_background_max = 15
+        self.distance_between_pastes = (0, 0)
         self.number_of_pastes_per_background_distribution_method = Distribution.Method.UNIFORM
+
+    def setup_generator_directory(self, project_dir):
+        super(ObjectDetectionConfiguration, self).setup_generator_directory(project_dir)
+        resource_classes_dir = join(project_dir, self.resource_classes_dir)
+        resource_backgrounds_dir = join(project_dir, self.resource_backgrounds_dir)
+        output_plain_image_dir = join(project_dir, self.output_plain_image_dir)
+        _, ex = create_directories([resource_classes_dir, resource_backgrounds_dir, output_plain_image_dir])
+        if ex is not None:
+            raise Exception(ex)
 
     # todo: implement
     def is_valid(self):
