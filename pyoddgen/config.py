@@ -4,7 +4,7 @@ from os.path import join
 from pyoddgen.generators.basegen import BaseGenerator
 from pyoddgen.generators.objdetgen import ObjectDetectionGenerator
 from pyoddgen.datastructures.gendataobjdet import ObjectDetectionDataRecord
-from pyoddgen.output.filewriter.jsonrecordwriter import JSONRecordWriter
+from pyoddgen.output.jsonrecordwriter import JSONRecordWriter
 from pyoddgen.serializable import Serializable
 from pyoddgen.tools.distribution import Distribution
 
