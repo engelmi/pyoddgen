@@ -2,7 +2,7 @@ import logging
 import tensorflow as tf
 from os.path import join
 
-from pyoddgen.writer.recordwriter import RecordWriter
+from pyoddgen.output.filewriter.recordwriter import RecordWriter
 from pyoddgen.datastructures.gendatarecord import GeneratedDataRecord
 
 
@@ -33,7 +33,8 @@ class TFRecordWriter(RecordWriter):
             logging.error('Error occurred while writing tf record: ' + str(e))
 
     def __del__(self):
-        try:
-            self.tf_writer.close()
-        except Exception as e:
-            logging.error("Exception while closing TFRecordWriter: " + str(e))
+        if hasattr(self, "tf_writer") and self.tf_writer is not None:
+            try:
+                self.tf_writer.close()
+            except Exception as e:
+                logging.error("Exception while closing TFRecordWriter: " + str(e))

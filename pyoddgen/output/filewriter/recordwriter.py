@@ -1,3 +1,4 @@
+from os.path import exists
 from pyoddgen.datastructures.gendatarecord import GeneratedDataRecord
 
 
@@ -13,6 +14,8 @@ class RecordWriter(object):
         """
         if not issubclass(record_type, GeneratedDataRecord):
             raise Exception("Record type must be a class inheriting '" + str(GeneratedDataRecord) + "'!")
+        if not exists(output_folder):
+            raise Exception("Output folder does not exist!")
         self.output_folder = output_folder
         self.record_type = record_type
 

@@ -1,7 +1,7 @@
 import os
 import logging
 
-from pyoddgen.writer.recordwriter import RecordWriter
+from pyoddgen.output.filewriter.recordwriter import RecordWriter
 from pyoddgen.datastructures.gendatarecord import GeneratedDataRecord
 
 
@@ -26,7 +26,7 @@ class JSONRecordWriter(RecordWriter):
         """
         Custom Finalizer. Used to close the file handle.
         """
-        if self.file_handle is not None:
+        if hasattr(self, "file_handle") and self.file_handle is not None:
             try:
                 self.file_handle.close()
             except Exception as ex:
