@@ -1,8 +1,8 @@
 import logging
 import tensorflow as tf
-from os.path import join
+from os.path import join, exists
 
-from pyoddgen.output.filewriter.recordwriter import RecordWriter
+from pyoddgen.output.recordwriter import RecordWriter
 from pyoddgen.datastructures.gendatarecord import GeneratedDataRecord
 
 
@@ -17,7 +17,10 @@ class TFRecordWriter(RecordWriter):
         :param output_folder: Output directory for the .record file.
         :param record_name: Output name for the .record file.
         """
-        super(TFRecordWriter, self).__init__(output_folder, record_type)
+        super(TFRecordWriter, self).__init__(record_type)
+        if not exists(output_folder):
+            raise Exception("Output folder does not exist!")
+        self.output_folder = output_folder
         self.record_name = record_name
         self.tf_writer = tf.python_io.TFRecordWriter(join(output_folder, record_name + '.record'))
 
