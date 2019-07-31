@@ -11,7 +11,7 @@ class RecordWriter(object):
         Constructor.
         """
         if not exists(output_folder):
-            raise Exception("Output folder does not exist!")
+            raise Exception("Output folder '" + output_folder + "' does not exist!")
         self.output_folder = output_folder
         self.record_name = record_name
 

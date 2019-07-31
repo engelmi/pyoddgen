@@ -1,8 +1,8 @@
 import logging
 import tensorflow as tf
-from os.path import join, exists
+from os.path import join
 
-from pyoddgen.output.recordwriter import RecordWriter
+from pyoddgen.output.filewriter.recordwriter import RecordWriter
 
 
 class TFRecordWriter(RecordWriter):

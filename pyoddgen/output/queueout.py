@@ -1,17 +1,14 @@
 import logging
 from queue import Queue
 
-from pyoddgen.output.recordwriter import RecordWriter
 
+class QueueOutput(object):
 
-class QueueWriter(RecordWriter):
-
-    def __init__(self, output_folder, record_name="data", queue_size=20):
+    def __init__(self, queue_size=20):
         """
         Constructor.
         :param queue_size: Size of the in-memory queue for the generated data.
         """
-        super(QueueWriter, self).__init__(output_folder, record_name)
         self.data_queue = Queue(maxsize=queue_size)
 
     def write_data(self, record, blocking=True):

@@ -2,7 +2,7 @@ import os
 import logging
 from os.path import join
 
-from pyoddgen.output.recordwriter import RecordWriter
+from pyoddgen.output.filewriter.recordwriter import RecordWriter
 
 
 class JSONRecordWriter(RecordWriter):
