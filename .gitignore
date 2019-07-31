@@ -105,3 +105,6 @@ venv.bak/
 
 # project directory
 .idea
+
+# test project
+project-1/
