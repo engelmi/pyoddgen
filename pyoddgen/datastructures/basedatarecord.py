@@ -1,7 +1,7 @@
 from pyoddgen.serializable import Serializable
 
 
-class GeneratedDataRecord(Serializable):
+class BaseDataRecord(Serializable):
     """
     Generated data record structure.
     """
@@ -13,7 +13,7 @@ class GeneratedDataRecord(Serializable):
         Constructor.
         :param data_dict: Dictionary containing the data of an object detection record.
         """
-        super(GeneratedDataRecord, self).__init__()
+        super(BaseDataRecord, self).__init__()
         self.data_dict = data_dict
 
     def to_json_record(self):

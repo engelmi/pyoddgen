@@ -1,22 +1,22 @@
-from pyoddgen.datastructures.gendatarecord import GeneratedDataRecord
+from pyoddgen.datastructures.basedatarecord import BaseDataRecord
 
 
-class ObjectDetectionDataRecord(GeneratedDataRecord):
+class ObjectDetectionDataRecord(BaseDataRecord):
     """
     Generated data record structure for use in object detection models.
     """
 
-    GeneratedDataRecord.mandatory_fields.append("image_encoded")
-    GeneratedDataRecord.mandatory_fields.append("image_width")
-    GeneratedDataRecord.mandatory_fields.append("image_height")
-    GeneratedDataRecord.mandatory_fields.append("image_format")
-    GeneratedDataRecord.mandatory_fields.append("filename")
-    GeneratedDataRecord.mandatory_fields.append("xmins")
-    GeneratedDataRecord.mandatory_fields.append("xmaxs")
-    GeneratedDataRecord.mandatory_fields.append("ymins")
-    GeneratedDataRecord.mandatory_fields.append("ymaxs")
-    GeneratedDataRecord.mandatory_fields.append("classes_text")
-    GeneratedDataRecord.mandatory_fields.append("classes")
+    BaseDataRecord.mandatory_fields.append("image_encoded")
+    BaseDataRecord.mandatory_fields.append("image_width")
+    BaseDataRecord.mandatory_fields.append("image_height")
+    BaseDataRecord.mandatory_fields.append("image_format")
+    BaseDataRecord.mandatory_fields.append("filename")
+    BaseDataRecord.mandatory_fields.append("xmins")
+    BaseDataRecord.mandatory_fields.append("xmaxs")
+    BaseDataRecord.mandatory_fields.append("ymins")
+    BaseDataRecord.mandatory_fields.append("ymaxs")
+    BaseDataRecord.mandatory_fields.append("classes_text")
+    BaseDataRecord.mandatory_fields.append("classes")
 
     def __init__(self, data_dict):
         """
