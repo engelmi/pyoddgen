@@ -6,11 +6,15 @@ class GeneratedDataRecord(Serializable):
     Generated data record structure.
     """
 
-    def __init__(self):
+    mandatory_fields = ["data_id"]
+
+    def __init__(self, data_dict):
         """
         Constructor.
+        :param data_dict: Dictionary containing the data of an object detection record.
         """
         super(GeneratedDataRecord, self).__init__()
+        self.data_dict = data_dict
 
     def to_json_record(self):
         """
@@ -25,3 +29,10 @@ class GeneratedDataRecord(Serializable):
         :return: The created .record object.
         """
         raise NotImplementedError("Must be implemented!")
+
+    def check_validity(self):
+        if self.data_dict is None:
+            return False, "data_dict must not be None!"
+        if not isinstance(self.data_dict, dict):
+            return False, "data_dict must be of type dict!"
+        return True, ""

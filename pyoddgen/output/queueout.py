@@ -2,17 +2,16 @@ import logging
 from queue import Queue
 
 from pyoddgen.output.recordwriter import RecordWriter
-from pyoddgen.datastructures.gendatarecord import GeneratedDataRecord
 
 
 class QueueWriter(RecordWriter):
 
-    def __init__(self, record_type, queue_size=20):
+    def __init__(self, output_folder, record_name="data", queue_size=20):
         """
         Constructor.
         :param queue_size: Size of the in-memory queue for the generated data.
         """
-        super(QueueWriter, self).__init__(record_type)
+        super(QueueWriter, self).__init__(output_folder, record_name)
         self.data_queue = Queue(maxsize=queue_size)
 
     def write_data(self, record, blocking=True):
@@ -22,8 +21,6 @@ class QueueWriter(RecordWriter):
         :param blocking:
         :return:
         """
-        if not isinstance(record, self.record_type):
-            raise Exception("Record parameter '" + str(record) + "' must be of type '" + str(type(GeneratedDataRecord)) + "'!")
         try:
             self.data_queue.put(record, block=blocking)
         except Exception as ex:

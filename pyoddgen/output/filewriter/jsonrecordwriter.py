@@ -1,9 +1,8 @@
 import os
 import logging
-from os.path import join, exists
+from os.path import join
 
 from pyoddgen.output.recordwriter import RecordWriter
-from pyoddgen.datastructures.gendatarecord import GeneratedDataRecord
 
 
 class JSONRecordWriter(RecordWriter):
@@ -11,17 +10,13 @@ class JSONRecordWriter(RecordWriter):
     Class to write generated data records to a json-like file.
     """
 
-    def __init__(self, output_folder, record_type, record_name="data"):
+    def __init__(self, output_folder, record_name="data"):
         """
         Constructor.
         :param output_folder: Output directory for the .record file.
         :param record_name: Output name for the .record file.
         """
-        super(JSONRecordWriter, self).__init__(record_type)
-        if not exists(output_folder):
-            raise Exception("Output folder does not exist!")
-        self.output_folder = output_folder
-        self.record_name = record_name
+        super(JSONRecordWriter, self).__init__(output_folder, record_name)
         with open(join(self.output_folder, self.record_name), "w") as f:
             f.write("[]")
         self.file_handle = open(join(self.output_folder, self.record_name), "r+")
@@ -40,8 +35,6 @@ class JSONRecordWriter(RecordWriter):
         """
         Writes a record entry to the defined .record file.
         """
-        if not isinstance(record, self.record_type):
-            raise Exception("Record parameter '" + str(record) + "' must be of type '" + str(type(GeneratedDataRecord)) + "'!")
         try:
             insert_pos = os.fstat(self.file_handle.fileno()).st_size - 1
             self.file_handle.seek(insert_pos)
