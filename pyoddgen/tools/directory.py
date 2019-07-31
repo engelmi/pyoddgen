@@ -1,6 +1,7 @@
 import shutil
+import importlib
 from os import makedirs
-from os.path import exists, isfile, isdir
+from os.path import exists
 
 
 def create_directory(directory):
@@ -33,3 +34,8 @@ def delete_directories(directory_list):
     except Exception as ex:
         return False, ex
     return True, None
+
+
+def import_on_runtime(module, to_import):
+    dynamic_import = importlib.import_module(module)
+    return getattr(dynamic_import, to_import)
