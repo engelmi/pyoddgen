@@ -2,10 +2,6 @@ from os import getcwd
 from os.path import join
 
 from pyoddgen.tools.directory import create_directory, create_directories, delete_directory
-from pyoddgen.generators.basegen import BaseGenerator
-from pyoddgen.generators.objdetgen import ObjectDetectionGenerator
-from pyoddgen.datastructures.gendataobjdet import ObjectDetectionDataRecord
-from pyoddgen.output.jsonrecordwriter import JSONRecordWriter
 from pyoddgen.serializable import Serializable
 from pyoddgen.tools.distribution import Distribution
 
@@ -13,101 +9,157 @@ from pyoddgen.tools.distribution import Distribution
 class ProjectConfiguration(Serializable):
 
     def __init__(self):
-        self.base_dir = getcwd()
-        self.project_dir = join(self.base_dir, "project-1")
-        self.generator_config_list = []
+        self.fields = dict()
+        self.fields["base_dir"] = ""
+        self.fields["project_dir"] = ""
+        self.fields["generator_config"] = None
 
     def setup_project_directory_structure(self):
         # clean up existing project and re-create it
-        delete_directory(self.project_dir)
-        create_directory(self.project_dir)
-
-    def setup_generator_directory_structures(self):
-        for generator in self.generator_config_list:
-            generator.setup_generator_directory(self.project_dir)
+        delete_directory(self.fields["project_dir"])
+        create_directory(self.fields["project_dir"])
 
     # todo: implement
-    def is_valid(self):
-        return True
+    def check_validity(self):
+        return True, ""
 
 
 class GeneratorConfiguration(Serializable):
 
     def __init__(self):
-        self.generator_class = BaseGenerator
-        self.generator_name = "sample-base-generator"
+        self.fields = dict()
+        self.fields["generator"] = ("", "")
 
         # directories
-        self.generator_dir = self.generator_name
-        self.resource_dir = join(self.generator_dir, "resources")
-        self.output_dir = join(self.generator_dir, "output")
+        self.fields["generator_dir"] = ""
+        self.fields["resource_dir"] = ""
+        self.fields["output_dir"] = ""
 
         # files
-        self.generated_data_log = join(self.generator_dir, "generated_data_log.csv")
-        self.used_distributions_file = join(self.generator_dir, "distributions.csv")
+        self.fields["generated_data_log_file"] = ""
+        self.fields["used_distributions_file"] = ""
 
         # generation
-        self.batch_size = 100
+        self.fields["batch_size"] = -1
 
         # writer
-        self.data_writer = JSONRecordWriter
-        self.data_record_type = ObjectDetectionDataRecord
+        self.fields["data_writer"] = ("", "")
+        self.fields["data_record_type"] = ("", "")
 
         # log
-        self.generated_data_log_enabled = True
+        self.fields["generated_data_log_file_enabled"] = None
 
     def setup_generator_directory(self, project_dir):
-        generator_dir = join(project_dir, self.generator_dir)
-        _, ex = delete_directory(generator_dir)
-        if ex is not None:
-            raise Exception("Error on deleting directory '" + generator_dir + "'!", ex)
+        generator_dir = join(project_dir, self.fields["generator_dir"])
+        delete_directory(generator_dir, force=True)
 
-        resource_dir = join(project_dir, self.config.resource_dir)
-        output_dir = join(project_dir, self.config.output_dir)
+        resource_dir = join(project_dir, self.fields["resource_dir"])
+        output_dir = join(project_dir, self.fields["output_dir"])
         _, ex = create_directories([resource_dir, output_dir])
         if ex is not None:
             raise Exception(ex)
 
     # todo: implement
-    def is_valid(self):
-        return True
+    def check_validity(self):
+        return True, ""
 
 
 class ObjectDetectionConfiguration(GeneratorConfiguration):
 
     def __init__(self):
-        self.generator_class = ObjectDetectionGenerator
-        self.generator_name = "sample-objdet-generator"
+        super(ObjectDetectionConfiguration, self).__init__()
 
         # directories
-        self.resource_classes_dir = join(self.resource_dir, "classes")
-        self.resource_backgrounds_dir = join(self.resource_dir, "backgrounds")
-        self.output_plain_image_dir = join(self.output_dir, "plain_images")
+        self.fields["resource_classes_dir"] = ""
+        self.fields["resource_backgrounds_dir"] = ""
+        self.fields["output_plain_image_dir"] = ""
 
         # files
-        self.classes_weights_file = join(self.resource_classes_dir, "class_weights.csv")
-        self.backgrounds_weights_file = join(self.resource_backgrounds_dir, "class_weights.csv")
+        self.fields["class_weights_file"] = ""
+        self.fields["backgrounds_weights_file"] = ""
 
         # generation
-        self.save_generated_plain_images = True
-        self.final_scale_factor = 1
-        self.class_distribution_method = Distribution.Method.UNIFORM
-        self.background_distribution_method = Distribution.Method.UNIFORM
-        self.position_distribution_method = Distribution.Method.UNIFORM
-        self.number_of_pastes_per_background_min = 0
-        self.number_of_pastes_per_background_max = 15
-        self.distance_between_pastes = (0, 0)
-        self.number_of_pastes_per_background_distribution_method = Distribution.Method.UNIFORM
+        self.fields["save_generated_plain_images"] = None
+        self.fields["final_scale_factor"] = 0
+        self.fields["class_distribution_method"] = None
+        self.fields["background_distribution_method"] = None
+        self.fields["position_distribution_method"] = None
+        self.fields["number_of_pastes_per_background_min"] = -1
+        self.fields["number_of_pastes_per_background_max"] = -1
+        self.fields["distance_between_pastes"] = -1
+        self.fields["number_of_pastes_per_background_distribution_method"] = None
 
     def setup_generator_directory(self, project_dir):
         super(ObjectDetectionConfiguration, self).setup_generator_directory(project_dir)
-        resource_classes_dir = join(project_dir, self.resource_classes_dir)
-        resource_backgrounds_dir = join(project_dir, self.resource_backgrounds_dir)
-        output_plain_image_dir = join(project_dir, self.output_plain_image_dir)
+        resource_classes_dir = join(project_dir, self.fields["resource_classes_dir"])
+        resource_backgrounds_dir = join(project_dir, self.fields["resource_backgrounds_dir"])
+        output_plain_image_dir = join(project_dir, self.fields["output_plain_image_dir"])
         _, ex = create_directories([resource_classes_dir, resource_backgrounds_dir, output_plain_image_dir])
         if ex is not None:
             raise Exception(ex)
 
     # todo: implement
-    def is_valid(self):
-        return True
+    def check_validity(self):
+        return True, ""
+
+
+def create_default_project_config():
+    config = ProjectConfiguration()
+    config.fields["base_dir"] = getcwd()
+    config.fields["project_dir"] = join(config.fields["base_dir"], "project-1")
+    config.fields["generator_config"] = create_default_object_detection_config()
+    return config
+
+
+def create_default_generator_config():
+    config = GeneratorConfiguration()
+    config.fields["generator"] = ("basegen", "BaseGenerator")
+    # directories
+    config.fields["generator_dir"] = config.fields["generator"][0]
+    config.fields["resource_dir"] = join(config.fields["generator_dir"], "resources")
+    config.fields["output_dir"] = join(config.fields["generator_dir"], "output")
+    # files
+    config.fields["generated_data_log_file"] = join(config.fields["generator_dir"], "generated_data_log_file.csv")
+    config.fields["used_distributions_file"] = join(config.fields["generator_dir"], "distributions.csv")
+    # generation
+    config.fields["batch_size"] = 100
+    # writer
+    config.fields["data_writer"] = ("filewriter.jsonrecordwriter", "JSONRecordWriter")
+    config.fields["data_record_type"] = ("basedatarecord", "BaseDataRecord")
+    # log
+    config.fields["generated_data_log_file_enabled"] = True
+    return config
+
+
+def create_default_object_detection_config():
+    config = ObjectDetectionConfiguration()
+    config.fields["generator"] = ("objdetgen", "ObjectDetectionGenerator")
+    # directories
+    config.fields["generator_dir"] = config.fields["generator"][0]
+    config.fields["resource_dir"] = join(config.fields["generator_dir"], "resources")
+    config.fields["output_dir"] = join(config.fields["generator_dir"], "output")
+    config.fields["resource_classes_dir"] = join(config.fields["resource_dir"], "classes")
+    config.fields["resource_backgrounds_dir"] = join(config.fields["resource_dir"], "backgrounds")
+    config.fields["output_plain_image_dir"] = join(config.fields["output_dir"], "plain_images")
+    # files
+    config.fields["generated_data_log_file"] = join(config.fields["generator_dir"], "generated_data_log_file.csv")
+    config.fields["used_distributions_file"] = join(config.fields["generator_dir"], "distributions.csv")
+    config.fields["class_weights_file"] = join(config.fields["resource_classes_dir"], "class_weights.csv")
+    config.fields["backgrounds_weights_file"] = join(config.fields["resource_backgrounds_dir"], "class_weights.csv")
+    # generation
+    config.fields["batch_size"] = 100
+    config.fields["save_generated_plain_images"] = True
+    config.fields["final_scale_factor"] = 1
+    config.fields["class_distribution_method"] = Distribution.Method.UNIFORM
+    config.fields["background_distribution_method"] = Distribution.Method.UNIFORM
+    config.fields["position_distribution_method"] = Distribution.Method.UNIFORM
+    config.fields["number_of_pastes_per_background_min"] = 0
+    config.fields["number_of_pastes_per_background_max"] = 15
+    config.fields["distance_between_pastes"] = (0, 0)
+    config.fields["number_of_pastes_per_background_distribution_method"] = Distribution.Method.UNIFORM
+    # writer
+    config.fields["data_writer"] = ("filewriter.jsonrecordwriter", "JSONRecordWriter")
+    config.fields["data_record_type"] = ("objectdetectionrecord", "ObjectDetectionDataRecord")
+    # log
+    config.fields["generated_data_log_file_enabled"] = True
+    return config
